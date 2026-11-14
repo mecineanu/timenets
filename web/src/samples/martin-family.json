@@ -1,0 +1,71 @@
+{
+  "title": "Martin family (fictional)",
+  "root": "claude",
+  "people": [
+    { "id": "victor", "firstName": "Victor", "lastName": "Martin", "sex": "M", "birth": "1850-02-11", "death": "1920-11-03" },
+    { "id": "jeanne", "firstName": "Jeanne", "lastName": "Roche", "sex": "F", "birth": "1855-06-20", "death": "1912-01-15" },
+    { "id": "rose", "firstName": "Rose", "lastName": "Vidal", "sex": "F", "birth": "1870-04-02", "death": "1940-08-30" },
+    { "id": "auguste", "firstName": "Auguste", "lastName": "Bernard", "sex": "M", "death": "1910-03-12" },
+    { "id": "marieclaire", "firstName": "Marie-Claire", "lastName": "Fontaine", "sex": "F", "birth": "1860-09-09", "death": "1935-12-01" },
+    { "id": "emile", "firstName": "Émile", "lastName": "Lefèvre", "sex": "M", "birth": "1845-05-05", "death": "1915-07-14" },
+    { "id": "adele", "firstName": "Adèle", "lastName": "Simon", "sex": "F", "birth": "1850", "birthUncertain": true, "death": "1920-02-02" },
+
+    { "id": "henri", "firstName": "Henri", "lastName": "Martin", "sex": "M", "birth": "1880-03-14", "death": "1951-10-22", "father": "victor", "mother": "jeanne" },
+    { "id": "louise", "firstName": "Louise", "lastName": "Bernard", "sex": "F", "birth": "1884-07-01", "death": "1960-04-18", "father": "auguste", "mother": "marieclaire" },
+    { "id": "paul", "firstName": "Paul", "lastName": "Lefèvre", "sex": "M", "birth": "1878-12-24", "death": "1940-06-10", "father": "emile", "mother": "adele" },
+    { "id": "marie", "firstName": "Marie", "lastName": "Durand", "sex": "F", "birth": "1882-02-28", "death": "1947-09-05" },
+
+    { "id": "jean", "firstName": "Jean", "lastName": "Martin", "sex": "M", "birth": "1908-05-17", "death": "1985-01-09", "father": "henri", "mother": "louise" },
+    { "id": "helene", "firstName": "Hélène", "lastName": "Lefèvre", "sex": "F", "birth": "1910-11-30", "death": "2002-03-27", "father": "paul", "mother": "marie" },
+
+    { "id": "claude", "firstName": "Claude", "lastName": "Martin", "sex": "M", "birth": "1935-08-02", "death": "2015-06-19", "father": "jean", "mother": "helene" },
+    { "id": "anne", "firstName": "Anne", "lastName": "Petit", "sex": "F", "birth": "1937-01-25", "death": "2020-12-04" },
+    { "id": "isabelle", "firstName": "Isabelle", "lastName": "Roux", "sex": "F", "birth": "1945-10-12" },
+
+    { "id": "philippe", "firstName": "Philippe", "lastName": "Martin", "sex": "M", "birth": "1959-04-03", "father": "claude", "mother": "anne" },
+    { "id": "sophie", "firstName": "Sophie", "lastName": "Martin", "sex": "F", "birth": "1962-09-21", "father": "claude", "mother": "anne" },
+    { "id": "lucas", "firstName": "Lucas", "lastName": "Roux", "sex": "M", "birth": "1968-02-14", "father": "claude", "mother": "isabelle" },
+    { "id": "thomas", "firstName": "Thomas", "lastName": "Martin", "sex": "M", "birth": "1971-06-30", "father": "claude", "mother": "isabelle" },
+    { "id": "julie", "firstName": "Julie", "lastName": "Martin", "sex": "F", "birth": "1974-12-08", "father": "claude", "mother": "isabelle" },
+
+    { "id": "nathalie", "firstName": "Nathalie", "lastName": "Garnier", "sex": "F", "birth": "1961-03-19" },
+    { "id": "marc", "firstName": "Marc", "lastName": "Lambert", "sex": "M", "birth": "1960-07-07" },
+    { "id": "olivier", "firstName": "Olivier", "lastName": "Faure", "sex": "M", "birth": "1958-01-30" },
+    { "id": "sarah", "firstName": "Sarah", "lastName": "Blanc", "sex": "F", "birth": "1970-05-05" },
+    { "id": "chloe", "firstName": "Chloé", "lastName": "Mercier", "sex": "F", "birth": "1975-08-16" },
+
+    { "id": "camille", "firstName": "Camille", "lastName": "Martin", "sex": "F", "birth": "1987-02-02", "father": "philippe", "mother": "nathalie" },
+    { "id": "hugo", "firstName": "Hugo", "lastName": "Martin", "sex": "M", "birth": "1990-10-10", "father": "philippe", "mother": "nathalie" },
+    { "id": "lea", "firstName": "Léa", "lastName": "Lambert", "sex": "F", "birth": "1986-04-25", "father": "marc", "mother": "sophie" },
+    { "id": "emma", "firstName": "Emma", "lastName": "Faure", "sex": "F", "birth": "1997-11-11", "father": "olivier", "mother": "sophie" },
+    { "id": "arthur", "firstName": "Arthur", "lastName": "Martin", "sex": "M", "birth": "2003-03-03", "father": "thomas", "mother": "chloe" },
+    { "id": "ines", "firstName": "Inès", "lastName": "Martin", "sex": "F", "birth": "2006-07-21", "father": "thomas", "mother": "chloe" },
+    { "id": "antoine", "firstName": "Antoine", "lastName": "Girard", "sex": "M", "birth": "1985-09-14" },
+    { "id": "louis", "firstName": "Louis", "lastName": "Girard", "sex": "M", "birth": "2014-05-29", "father": "antoine", "mother": "camille" }
+  ],
+  "marriages": [
+    { "spouses": ["victor", "jeanne"], "start": "1876-04-10" },
+    { "spouses": ["victor", "rose"], "start": "1914-06-01" },
+    { "spouses": ["auguste", "marieclaire"], "start": "1882", "startUncertain": true },
+    { "spouses": ["emile", "adele"], "start": "1872-09-15" },
+    { "spouses": ["henri", "louise"], "start": "1905-05-20" },
+    { "spouses": ["paul", "marie"], "start": "1903-10-03" },
+    { "spouses": ["jean", "helene"], "start": "1932-07-09" },
+    { "spouses": ["claude", "anne"], "start": "1958-09-13", "end": "1967-03-01", "divorced": true },
+    { "spouses": ["claude", "isabelle"], "start": "1969-06-21" },
+    { "spouses": ["philippe", "nathalie"], "start": "1985-06-15" },
+    { "spouses": ["sophie", "marc"], "start": "1984-09-01", "end": "1992-05-10", "divorced": true },
+    { "spouses": ["sophie", "olivier"], "start": "1995-07-08" },
+    { "spouses": ["lucas", "sarah"], "start": "1994-09-24" },
+    { "spouses": ["thomas", "chloe"], "start": "2001-05-26" },
+    { "spouses": ["camille", "antoine"], "start": "2012-08-18" }
+  ],
+  "events": [
+    { "name": "World War I", "start": "1914-07-28", "end": "1918-11-11", "historical": true },
+    { "name": "World War II", "start": "1939-09-01", "end": "1945-05-08", "historical": true },
+    { "name": "Fall of the Berlin Wall", "start": "1989-11-09", "historical": true },
+    { "name": "Bakery opens", "start": "1912-04-01", "location": "Clermont-Ferrand", "description": "Henri and Louise take over the bakery on the market square.", "people": ["henri", "louise"] },
+    { "name": "Move to Lyon", "start": "1950-09-15", "location": "Lyon", "description": "Jean is transferred; the whole family moves.", "people": ["jean", "helene", "claude"] },
+    { "name": "Family reunion", "start": "2010-08-14", "location": "Annecy", "description": "Claude's 75th birthday.", "people": ["claude", "isabelle", "philippe", "sophie", "lucas", "thomas", "julie"] }
+  ]
+}

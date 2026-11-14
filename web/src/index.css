@@ -1,0 +1,391 @@
+:root {
+  --bg: #fbfbfa;
+  --panel: #ffffff;
+  --text: #1f2328;
+  --muted: #646a73;
+  --border: #e3e3e0;
+  --accent: #4e7d0a;
+  --male: #3465a4;
+  --female: #cc0000;
+  --nosex: #555753;
+  --label-inside: #ffffff;
+  --label-outside: #1f2328;
+  --grid: #ececea;
+  --band: #d3d7cf;
+  --band-text: #6d716a;
+  --event: #f0951c;
+  --select: #8ae234;
+  --pin: #e8d138;
+  --uncertain: #edd400;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+
+  font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #17181a;
+    --panel: #1f2023;
+    --text: #e6e6e3;
+    --muted: #9ba0a6;
+    --border: #34363a;
+    --accent: #8ae234;
+    --male: #5b8bd0;
+    --female: #e0474a;
+    --nosex: #8a8d87;
+    --label-outside: #e6e6e3;
+    --grid: #26282b;
+    --band: #3a3d40;
+    --band-text: #a2a69f;
+    --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #17181a;
+  --panel: #1f2023;
+  --text: #e6e6e3;
+  --muted: #9ba0a6;
+  --border: #34363a;
+  --accent: #8ae234;
+  --male: #5b8bd0;
+  --female: #e0474a;
+  --nosex: #8a8d87;
+  --label-outside: #e6e6e3;
+  --grid: #26282b;
+  --band: #3a3d40;
+  --band-text: #a2a69f;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr 300px;
+  height: 100%;
+}
+
+.toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.brand {
+  font-weight: 650;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  margin-right: 4px;
+}
+
+.brand small {
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.group label {
+  color: var(--muted);
+}
+
+.toolbar select,
+.toolbar input[type='search'],
+.toolbar input[type='number'],
+.btn {
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 0 8px;
+}
+
+.toolbar input[type='number'] {
+  width: 64px;
+}
+
+.btn {
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--muted);
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg button {
+  border: 0;
+  background: var(--bg);
+  padding: 0 10px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.seg button + button {
+  border-left: 1px solid var(--border);
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  background: var(--bg);
+}
+
+.stage svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  user-select: none;
+}
+
+.stage svg:active {
+  cursor: grabbing;
+}
+
+.lifeline {
+  cursor: pointer;
+}
+
+.lifeline path {
+  fill: none;
+  transition: d 0.5s ease, opacity 0.3s;
+}
+
+.lifeline .hit {
+  stroke: transparent;
+  stroke-width: 18px;
+}
+
+.lifeline text {
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+  transition: transform 0.5s ease;
+}
+
+.lifeline.selected .main {
+  filter: drop-shadow(0 0 4px var(--select)) drop-shadow(0 0 2px var(--select));
+}
+
+.lifeline.pinned .main {
+  filter: drop-shadow(0 0 4px var(--pin)) drop-shadow(0 0 2px var(--pin));
+}
+
+.lifeline.match .main {
+  filter: drop-shadow(0 0 5px var(--event));
+}
+
+.lifeline.dim {
+  opacity: 0.35;
+}
+
+.drop path {
+  fill: none;
+  stroke-dasharray: 4 3;
+  transition: d 0.5s ease;
+}
+
+.axis text {
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.band text {
+  font-size: 11px;
+  fill: var(--band-text);
+}
+
+.event-dot {
+  cursor: help;
+  transition: transform 0.5s ease;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  max-width: 280px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-size: 12.5px;
+  z-index: 5;
+}
+
+.tooltip b {
+  display: block;
+  font-size: 13px;
+}
+
+.tooltip .muted {
+  color: var(--muted);
+}
+
+.panel {
+  border-left: 1px solid var(--border);
+  background: var(--panel);
+  overflow: auto;
+  padding: 14px 16px;
+  min-height: 0;
+}
+
+.panel h2 {
+  font-size: 17px;
+  margin: 0 0 2px;
+}
+
+.panel h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  margin: 16px 0 6px;
+}
+
+.panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.panel li {
+  margin: 3px 0;
+}
+
+.linkish {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+
+.linkish:hover {
+  text-decoration-color: currentColor;
+}
+
+.sw {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: baseline;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.help {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.help kbd {
+  font: 11px ui-monospace, monospace;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--muted);
+}
+
+.dropzone {
+  position: absolute;
+  inset: 12px;
+  border: 2px dashed var(--accent);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  font-size: 16px;
+  z-index: 10;
+}
+
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(360px, 1fr) auto;
+  }
+
+  .panel {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    max-height: 40vh;
+  }
+
+  .toolbar {
+    padding: 8px 16px;
+  }
+}
