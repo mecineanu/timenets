@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Genealogy } from './model/genealogy';
-import { type JsonGenealogy, fromJson, parseGenealogy } from './model/io';
+import { type JsonGenealogy, decodeGenealogyFile, fromJson, parseGenealogy } from './model/io';
 import { DEFAULT_OPTIONS, type ViewOptions, type ViewState, computeView, defaultRoot } from './engine/timenet';
 import { InfoPanel } from './ui/InfoPanel';
 import { TimeNetView } from './ui/TimeNetView';
@@ -32,11 +32,14 @@ export default function App() {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [loadCount, setLoadCount] = useState(0);
   const stageRef = useRef<HTMLDivElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
+    // measure right away too: ResizeObserver callbacks can be delayed in background tabs
+    const box = el.getBoundingClientRect();
+    setSize({ width: Math.round(box.width), height: Math.round(box.height) });
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       setSize({ width: Math.round(width), height: Math.round(height) });
@@ -44,6 +47,12 @@ export default function App() {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!notice || notice.startsWith('Reading')) return;
+    const t = setTimeout(() => setNotice(null), 6000);
+    return () => clearTimeout(t);
+  }, [notice]);
 
   const view = useMemo(() => {
     if (size.width < 50 || size.height < 50) return null;
@@ -68,10 +77,15 @@ export default function App() {
   }, []);
 
   const openFile = async (file: File) => {
+    setNotice(`Reading ${file.name}…`);
     try {
-      load(parseGenealogy(await file.text(), file.name), file.name);
+      const { text, encoding } = decodeGenealogyFile(await file.arrayBuffer());
+      const g = parseGenealogy(text, file.name);
+      load(g, file.name);
+      setNotice(`${file.name}: ${g.people.length} people, ${g.marriages.length} marriages (${encoding})`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setNotice(null);
+      setError(`${file.name}: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
 
@@ -123,8 +137,7 @@ export default function App() {
             aria-label="Dataset"
             value={SAMPLES[source] ? source : 'file'}
             onChange={(e) => {
-              if (e.target.value === 'import') fileRef.current?.click();
-              else if (SAMPLES[e.target.value]) load(SAMPLES[e.target.value].load(), e.target.value);
+              if (SAMPLES[e.target.value]) load(SAMPLES[e.target.value].load(), e.target.value);
             }}
           >
             {Object.entries(SAMPLES).map(([k, s]) => (
@@ -133,19 +146,21 @@ export default function App() {
               </option>
             ))}
             {!SAMPLES[source] && <option value="file">{source}</option>}
-            <option value="import">Import a file (.ged, .json)…</option>
           </select>
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".ged,.json,application/json"
-            hidden
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void openFile(f);
-              e.target.value = '';
-            }}
-          />
+          {/* A real <label> around the input: opening a file picker from a <select> change
+              is blocked silently by some browsers. No `accept` filter either: Safari greys out
+              .ged files because it does not know their type. */}
+          <label className="btn file-btn">
+            Open file…
+            <input
+              type="file"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void openFile(f);
+                e.target.value = '';
+              }}
+            />
+          </label>
         </div>
 
         <div className="group">
@@ -258,9 +273,15 @@ export default function App() {
           <div className="empty">{size.width ? 'Nothing to display.' : ''}</div>
         )}
         {error && (
-          <div className="tooltip" style={{ left: 16, top: 40 }} role="alert">
+          <button type="button" className="tooltip notice error" role="alert" onClick={() => setError(null)}>
             <b>Import failed</b>
             {error}
+            <span className="muted"> (click to dismiss)</span>
+          </button>
+        )}
+        {notice && !error && (
+          <div className="tooltip notice" role="status">
+            {notice}
           </div>
         )}
         {dragging && <div className="dropzone">Drop a GEDCOM (.ged) or JSON file</div>}

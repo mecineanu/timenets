@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { parseGedcomDate, parseGenealogy } from '../model/io';
+import { decodeGenealogyFile, parseGedcomDate, parseGenealogy } from '../model/io';
 import { EvtType } from './scene';
 import { DEFAULT_OPTIONS, computeView, defaultRoot } from './timenet';
 
@@ -27,6 +27,25 @@ describe('io', () => {
     expect(parseGedcomDate('ABT 1924')?.uncertain).toBe(true);
     expect(parseGedcomDate('BET 1900 AND 1910')?.date.getFullYear()).toBe(1905);
     expect(parseGedcomDate('nonsense')).toBeNull();
+  });
+
+  it('decodes the usual GEDCOM encodings', () => {
+    const ged = (charset: string, name: number[]) =>
+      new Uint8Array([...new TextEncoder().encode(`0 HEAD\n1 CHAR ${charset}\n0 @I1@ INDI\n1 NAME `), ...name, ...new TextEncoder().encode(' /X/\n0 TRLR\n')]);
+    const first = (bytes: Uint8Array) => parseGenealogy(decodeGenealogyFile(bytes.buffer as ArrayBuffer).text, 'x.ged').people[0].firstName;
+    // "Hélène"
+    expect(first(ged('UTF-8', [...new TextEncoder().encode('Hélène')]))).toBe('Hélène');
+    expect(first(ged('ANSI', [0x48, 0xe9, 0x6c, 0xe8, 0x6e, 0x65]))).toBe('Hélène'); // Windows-1252
+    expect(first(ged('ANSEL', [0x48, 0xe2, 0x65, 0x6c, 0xe1, 0x65, 0x6e, 0x65]))).toBe('Hélène'); // marks before letters
+    const utf16 = new Uint8Array([0xff, 0xfe, ...new Uint8Array(new Uint16Array([...'0 HEAD\n0 @I1@ INDI\n1 NAME Hélène /X/\n0 TRLR\n'].map((c) => c.charCodeAt(0))).buffer)]);
+    expect(decodeGenealogyFile(utf16.buffer).encoding).toBe('UTF-16');
+    expect(first(utf16)).toBe('Hélène');
+  });
+
+  it('accepts .gedcom files and rejects files without people', () => {
+    expect(parseGenealogy('0 HEAD\n0 @I1@ INDI\n1 NAME A /B/\n0 TRLR', 'tree.GEDCOM').people).toHaveLength(1);
+    expect(() => parseGenealogy('0 HEAD\n0 TRLR', 'empty.ged')).toThrow(/No people/);
+    expect(() => parseGenealogy('hello', 'notes.txt')).toThrow(/Unrecognized format/);
   });
 
   it('loads the GEDCOM sample', () => {

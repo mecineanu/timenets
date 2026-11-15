@@ -389,3 +389,24 @@ input {
     padding: 8px 16px;
   }
 }
+
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.file-btn input {
+  display: none;
+}
+
+.notice {
+  left: 16px;
+  top: 40px;
+  text-align: left;
+  pointer-events: auto;
+}
+
+.notice.error {
+  border-color: var(--female);
+  cursor: pointer;
+}

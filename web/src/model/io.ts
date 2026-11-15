@@ -264,10 +264,68 @@ export function fromGedcom(text: string, title?: string): Genealogy {
 }
 
 export function parseGenealogy(text: string, fileName = ''): Genealogy {
-  const trimmed = text.trimStart();
-  if (trimmed.startsWith('{')) return fromJson(JSON.parse(text) as JsonGenealogy);
-  if (/^﻿?0\s+HEAD/i.test(trimmed) || fileName.toLowerCase().endsWith('.ged')) {
-    return fromGedcom(text, fileName.replace(/\.ged$/i, ''));
+  const trimmed = text.replace(/^﻿/, '').trimStart();
+  let g: Genealogy;
+  if (trimmed.startsWith('{')) {
+    g = fromJson(JSON.parse(trimmed) as JsonGenealogy);
+  } else if (/^0\s+HEAD/i.test(trimmed) || /\.ged(com)?$/i.test(fileName)) {
+    g = fromGedcom(trimmed, fileName.replace(/\.ged(com)?$/i, ''));
+  } else {
+    throw new Error('Unrecognized format: expected a JSON or GEDCOM (.ged) file.');
   }
-  throw new Error('Unrecognized format: expected a JSON or GEDCOM (.ged) file.');
+  if (g.people.length === 0) throw new Error('No people (INDI records) found in this file.');
+  return g;
+}
+
+// ---------------------------------------------------------------- character encodings
+
+/** ANSEL (ANSI Z39.47), the historical GEDCOM character set: specials and combining diacritics */
+const ANSEL_SPECIAL: Record<number, string> = {
+  0xa1: 'Ł', 0xa2: 'Ø', 0xa3: 'Đ', 0xa4: 'Þ', 0xa5: 'Æ', 0xa6: 'Œ', 0xa7: 'ʹ', 0xa8: '·', 0xa9: '♭', 0xaa: '®',
+  0xab: '±', 0xac: 'Ơ', 0xad: 'Ư', 0xae: 'ʼ', 0xb0: 'ʻ', 0xb1: 'ł', 0xb2: 'ø', 0xb3: 'đ', 0xb4: 'þ', 0xb5: 'æ',
+  0xb6: 'œ', 0xb7: 'ʺ', 0xb8: 'ı', 0xb9: '£', 0xba: 'ð', 0xbc: 'ơ', 0xbd: 'ư', 0xc0: '°', 0xc1: 'ℓ', 0xc2: '℗',
+  0xc3: '©', 0xc4: '♯', 0xc5: '¿', 0xc6: '¡', 0xcf: 'ß',
+};
+const ANSEL_COMBINING: Record<number, string> = {
+  0xe0: '̉', 0xe1: '̀', 0xe2: '́', 0xe3: '̂', 0xe4: '̃', 0xe5: '̄', 0xe6: '̆',
+  0xe7: '̇', 0xe8: '̈', 0xe9: '̌', 0xea: '̊', 0xeb: '︠', 0xec: '︡', 0xed: '̕',
+  0xee: '̋', 0xef: '̐', 0xf0: '̧', 0xf1: '̨', 0xf2: '̣', 0xf3: '̤', 0xf4: '̥',
+  0xf5: '̳', 0xf6: '̲', 0xf7: '̦', 0xf8: '̜', 0xf9: '̮', 0xfa: '︢', 0xfb: '︣',
+  0xfe: '̓',
+};
+
+function decodeAnsel(bytes: Uint8Array): string {
+  let out = '';
+  let pending = '';
+  for (const b of bytes) {
+    if (ANSEL_COMBINING[b]) {
+      // ANSEL puts combining marks before the base letter; Unicode after it
+      pending += ANSEL_COMBINING[b];
+      continue;
+    }
+    out += (b < 0x80 ? String.fromCharCode(b) : ANSEL_SPECIAL[b] ?? '�') + pending;
+    pending = '';
+  }
+  return (out + pending).normalize('NFC');
+}
+
+/**
+ * Decode a genealogy file: UTF-8 (with or without BOM), UTF-16 (BOM), ANSEL (as declared in the
+ * GEDCOM header) and, as a last resort, Windows-1252 — common in exports from older software.
+ */
+export function decodeGenealogyFile(buf: ArrayBuffer): { text: string; encoding: string } {
+  const bytes = new Uint8Array(buf);
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) return { text: new TextDecoder('utf-16le').decode(bytes), encoding: 'UTF-16' };
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) return { text: new TextDecoder('utf-16be').decode(bytes), encoding: 'UTF-16' };
+  // UTF-16 without BOM: "0 HEAD" with zero bytes in between
+  if (bytes[0] === 0x30 && bytes[1] === 0) return { text: new TextDecoder('utf-16le').decode(bytes), encoding: 'UTF-16' };
+  if (bytes[0] === 0 && bytes[1] === 0x30) return { text: new TextDecoder('utf-16be').decode(bytes), encoding: 'UTF-16' };
+  const head = new TextDecoder('latin1').decode(bytes.subarray(0, 4096));
+  const declared = /\n\s*1\s+CHAR\s+(\S+)/i.exec(head)?.[1]?.toUpperCase();
+  if (declared === 'ANSEL') return { text: decodeAnsel(bytes), encoding: 'ANSEL' };
+  try {
+    return { text: new TextDecoder('utf-8', { fatal: true }).decode(bytes), encoding: 'UTF-8' };
+  } catch {
+    return { text: new TextDecoder('windows-1252').decode(bytes), encoding: 'Windows-1252' };
+  }
 }
